@@ -1,15 +1,15 @@
 {
-  "name": "dis_pid_bot",
+  "name": "discord_pidor_bot",
   "version": "1.0.0",
   "description": "Pidor bot for Discord",
   "main": "app.js",
   "type": "module",
+  "author": "Roman Sergeev",
+  "license": "MIT",
   "scripts": {
     "start": "node app.js",
     "csf": "standard --fix"
   },
-  "author": "Roman Sergeev",
-  "license": "MIT",
   "dependencies": {
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
@@ -17,6 +17,7 @@
     "log4js": "^6.9.1",
     "moment-timezone": "^0.5.43",
     "nedb": "^1.8.0",
-    "node-schedule": "^2.1.1"
+    "node-schedule": "^2.1.1",
+    "standard": "^17.1.0"
   }
 }

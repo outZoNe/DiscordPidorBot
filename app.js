@@ -1,20 +1,20 @@
-import {Client, GatewayIntentBits, REST, Routes} from 'discord.js'
+import { Client, GatewayIntentBits, REST, Routes } from 'discord.js'
 import log4js from 'log4js'
-import _sample from 'lodash/sample.js';
-import _countBy from 'lodash/countBy.js';
-import _each from 'lodash/each.js';
-import {CMD_PIDOR_DETECT, CMD_PIDOR_INFO, CMD_PIDOR_TOP, COMMAND_LIST} from "./src/commands.js";
+import _sample from 'lodash/sample.js'
+import _countBy from 'lodash/countBy.js'
+import _each from 'lodash/each.js'
+import { CMD_PIDOR_DETECT, CMD_PIDOR_INFO, CMD_PIDOR_TOP, COMMAND_LIST } from './src/commands.js'
 import Datastore from 'nedb'
-import moment from "moment-timezone";
-import {scheduleJob} from 'node-schedule'
+import moment from 'moment-timezone'
+import { scheduleJob } from 'node-schedule'
 import 'dotenv/config'
-import {AUDIO_LIST} from "./src/audio.js";
+import { AUDIO_LIST } from './src/audio.js'
 
 log4js.configure('config/log4js.json')
 const logger = log4js.getLogger()
 
-const usersCollection = new Datastore({filename: 'database/users'});
-usersCollection.loadDatabase();
+const usersCollection = new Datastore({ filename: 'database/users' })
+usersCollection.loadDatabase()
 
 const rest = new REST({
   version: '10'
@@ -22,16 +22,16 @@ const rest = new REST({
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMembers
   ]
 })
 
 scheduleJob('0 12 * * *', () => {
-  sendMsg()
-});
+  findFag()
+})
 
 try {
-  await rest.put(Routes.applicationCommands(process.env.BOT_ID), {body: COMMAND_LIST})
+  await rest.put(Routes.applicationCommands(process.env.BOT_ID), { body: COMMAND_LIST })
 } catch (err) {
   logger.error(err)
 }
@@ -47,7 +47,7 @@ client.on('interactionCreate', async interaction => {
 
   if (interaction.commandName === CMD_PIDOR_DETECT) {
     interaction.reply('Начинаю расчет пидарасов!').then(() => {
-      sendMsg()
+      findFag()
     }).catch(err => {
       logger.error(err)
     })
@@ -56,9 +56,9 @@ client.on('interactionCreate', async interaction => {
   if (interaction.commandName === CMD_PIDOR_TOP) {
     usersCollection.find({}, (err, res) => {
       let gaysTop = _countBy(res, 'id')
-      gaysTop = Object.fromEntries(Object.entries(gaysTop).sort((a, b) => a[1] >= b[1] ? -1 : 1));
+      gaysTop = Object.fromEntries(Object.entries(gaysTop).sort((a, b) => a[1] >= b[1] ? -1 : 1))
 
-      let msg = 'Топ пидоров:\n';
+      let msg = 'Топ пидоров:\n'
       _each(gaysTop, (val, key) => {
         msg += '<@' + key + '> дырок: ' + val + '\n'
       })
@@ -82,33 +82,34 @@ client.on('interactionCreate', async interaction => {
   }
 })
 
-
-const sendMsg = () => {
+const findFag = () => {
   client.channels.fetch(process.env.CHANNEL_ID).then(async channel => {
     try {
-      const guild = await client.guilds.fetch(process.env.SERVER_ID);
-      const members = await guild.members.fetch({force: true})
-
-      let guildUsers = []
+      const guild = await client.guilds.fetch(process.env.SERVER_ID)
+      const members = await guild.members.fetch({ force: true })
+      const guildUsers = []
       members.forEach(el => {
         if (el.user.bot === false) {
           guildUsers.push(el.user)
         }
       })
 
-      let randomUser = _sample(guildUsers);
-      let today = moment().tz('Europe/Moscow').format('Y-MM-DD');
-      usersCollection.find({createdAt: today}, (err, res) => {
+      const sendAudio = () => {
+        client.channels.fetch(process.env.CHANNEL_ID).then(async channel => {
+          channel.send({ files: [_sample(AUDIO_LIST)] })
+        })
+      }
+
+      const randomUser = _sample(guildUsers)
+      const today = moment().tz('Europe/Moscow').format('Y-MM-DD')
+      usersCollection.find({ createdAt: today }, (err, res) => {
         if (res?.length) {
           channel.send('Сегодня пидор уже найден!\nЭто: <@' + res[0]?.id + '>')
-          client.channels.fetch(process.env.CHANNEL_ID).then(async channel => {
-            channel.send({files: [AUDIO_LIST[0]]})
-          })
+          sendAudio()
         } else {
+          usersCollection.insert({ ...randomUser, createdAt: today })
           channel.send('Кручу верчу пидора найти хачу!\nЭто ты: <@' + randomUser.id + '>')
-          client.channels.fetch(process.env.CHANNEL_ID).then(async channel => {
-            channel.send({files: [AUDIO_LIST[0]]})
-          })
+          sendAudio()
         }
       })
     } catch (err) {
@@ -117,5 +118,4 @@ const sendMsg = () => {
   })
 }
 
-client.login(process.env.BOT_TOKEN).then(() => {
-})
+client.login(process.env.BOT_TOKEN).then(() => {})

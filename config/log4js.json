@@ -1,0 +1,16 @@
+{
+  "appenders": {
+    "info": {
+      "type": "file",
+      "filename": "log/info.log"
+    }
+  },
+  "categories": {
+    "default": {
+      "appenders": [
+        "info"
+      ],
+      "level": "DEBUG"
+    }
+  }
+}

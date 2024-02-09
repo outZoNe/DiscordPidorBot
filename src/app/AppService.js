@@ -60,10 +60,8 @@ export const botInfo = () => {
 
 export const findFag = (argMsg = '') => {
   client.channels.fetch(process.env.CHANNEL_ID).then(async channel => {
-    const guild = await client.guilds.fetch(process.env.SERVER_ID)
-    const members = await guild.members.fetch({ force: true })
     const guildUsers = []
-    members?.forEach(el => el.user.bot === false && guildUsers.push(el.user))
+    channel?.members?.forEach(el => el.user.bot === false && guildUsers.push(el.user))
 
     const sendAudio = () => {
       client.channels.fetch(process.env.CHANNEL_ID).then(async channel => {

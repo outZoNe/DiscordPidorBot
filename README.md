@@ -2,10 +2,10 @@
 
 ## Как запустить?
 
-1) Создайте своего бота тут: https://discord.com/developers/ и подключите его себе на сервер
-2) `npm install`
-3) `cp .env.example .env` и заполнить его
-4) `npm run start` я бы рекомендовал запускать через `pm2` например так: `pm2 start app.js --name bot_for_me`. Но кто я такой, чтобы Вам указывать
+1. Создайте своего бота тут: https://discord.com/developers/ и подключите его себе на сервер
+2. `npm install`
+3. `cp .env.example .env` и заполнить его
+4. `npm run start` я бы рекомендовал запускать через `pm2` например так: `pm2 start app.js --name bot_for_me`. Но кто я такой, чтобы Вам указывать
 
 ```dotenv
 BOT_ID=<APPLICATION_ID_с_сайта_настроект_бота>

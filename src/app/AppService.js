@@ -99,6 +99,7 @@ export const findFag = (argMsg = "") => {
           .then(async () => {
             let msg = argMsg + "Это ты: <@" + randomUser.id + ">";
             msg += (await getMonthFagot()) ?? "";
+            msg += (await getYearFagot()) ?? "";
             channel.send(msg);
           })
           .catch((err) => {
